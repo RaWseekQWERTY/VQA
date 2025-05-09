@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Visual Question Answering</title>
+</head>
+<body>
+    <h1>Ask a Question About an Image</h1>
+
+    <!-- Show Image if available -->
+    {% if image_path %}
+        <img src="{{ image_path }}" alt="Selected Image" width="300">
+    {% endif %}
+
+    <br><br>
+
+    <!-- Random Image Button -->
+    <form action="/random-image/" method="get">
+        <button type="submit">Use Random Image</button>
+    </form>
+
+    <br>
+
+    <!-- Upload Image -->
+    <form action="/" method="get" enctype="multipart/form-data">
+        <input type="file" name="image_file" accept="image/*" onchange="this.form.submit()">
+    </form>
+
+    <br>
+
+    <!-- Question Form -->
+    <form action="/predict/" method="post" enctype="multipart/form-data">
+        <input type="text" name="question" placeholder="Enter your question..." required><br><br>
+        {% if image_path %}
+            <!-- Preserve the shown image path in a hidden field -->
+            <input type="hidden" name="image_path" value="{{ image_path }}">
+        {% endif %}
+        <button type="submit">Submit</button>
+    </form>
+</body>
+</html>

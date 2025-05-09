@@ -1,0 +1,11 @@
+<h2>VQA Result</h2>
+<img src="{{ image_path }}" alt="Image" style="max-height: 300px;"><br><br>
+{% if image_path %}
+    <img src="{{ image_path }}" alt="Selected image" width="300">
+{% endif %}
+
+<strong>Question:</strong> {{ question }}<br>
+<strong>Predicted Answer:</strong> {{ answer }}<br>
+<strong>Confidence:</strong> {{ confidence }}<br><br>
+
+<a href="/">Try another</a>
