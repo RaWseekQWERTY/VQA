@@ -1,6 +1,6 @@
 import random
 from fastapi import FastAPI, File, UploadFile, Form, Request
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from model import VQAModel
@@ -73,51 +73,55 @@ async def home(request: Request, image_path: str = None):
         "answer": None
     })
 
-
-from fastapi.responses import RedirectResponse
+@app.post("/upload/", response_class=RedirectResponse)
+async def upload_image(image_file: UploadFile = File(...)):
+    # Save the uploaded image
+    unique_filename = f"{uuid.uuid4().hex}_{image_file.filename}"
+    save_path = f"static/images/{unique_filename}"
+    
+    with open(save_path, "wb") as f:
+        contents = await image_file.read()
+        f.write(contents)
+    
+    # Redirect to home page with the uploaded image path
+    return RedirectResponse(url=f"/?image_path=/static/images/{unique_filename}", status_code=302)
 
 @app.get("/random-image/")
 async def get_random_image():
     img_path = random.choice(test_image_paths)
     filename = os.path.basename(img_path)
     static_img_path = f"static/images/{filename}"
-    shutil.copy(img_path, static_img_path)
+    
+    # Copy the image only if it doesn't exist
+    if not os.path.exists(static_img_path):
+        shutil.copy(img_path, static_img_path)
+        
     return RedirectResponse(url=f"/?image_path=/static/images/{filename}", status_code=302)
-
 
 @app.post("/predict/", response_class=HTMLResponse)
 async def predict(
     request: Request,
     question: str = Form(...),
-    image_file: UploadFile = File(None),  
-    image_path: str = Form(None),         
+    image_path: str = Form(...),  # Now required
 ):
-    # Case 1: Uploaded image
-    if image_file is not None:
-        contents = await image_file.read()
-        save_path = f"static/images/{image_file.filename}"
-        with open(save_path, "wb") as f:
-            f.write(contents)
-        used_image_path = save_path
-
-    # Case 2: Image from hidden input
-    elif image_path is not None:
-        used_image_path = image_path
-
-    else:
+    # Ensure image_path is provided
+    if not image_path:
         return templates.TemplateResponse("index.html", {
             "request": request,
             "image_path": None,
             "answer": "❌ No image provided.",
         })
+    
+    # Convert URL path to local file path
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-    local_image_path = os.path.join(BASE_DIR, used_image_path.lstrip("/"))
+    local_image_path = os.path.join(BASE_DIR, image_path.lstrip("/"))
+    
     # Run inference
     answer, confidence = vqa_inference_vit(local_image_path, question)
 
     return templates.TemplateResponse("result.html", {
         "request": request,
-        "image_path": used_image_path,
+        "image_path": image_path,
         "question": question,
         "answer": answer,
         "confidence": f"{confidence * 100:.2f}%"

@@ -1,11 +1,78 @@
-<h2>VQA Result</h2>
-<img src="{{ image_path }}" alt="Image" style="max-height: 300px;"><br><br>
-{% if image_path %}
-    <img src="{{ image_path }}" alt="Selected image" width="300">
-{% endif %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>VQA Result</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        h1, h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .result-container {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .image-container {
+            margin: 20px 0;
+            text-align: center;
+        }
+        .result-item {
+            margin-bottom: 10px;
+        }
+        .answer-box {
+            padding: 15px;
+            background-color: #e8f5e9;
+            border-left: 5px solid #4CAF50;
+            margin-bottom: 20px;
+        }
+        .confidence {
+            font-size: 0.9em;
+            color: #666;
+        }
+        a.button {
+            display: inline-block;
+            padding: 8px 15px;
+            background-color: #2196F3;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+        a.button:hover {
+            background-color: #0b7dda;
+        }
+    </style>
+</head>
+<body>
+    <h1>Visual Question Answering</h1>
+    
+    <div class="image-container">
+        {% if image_path %}
+            <img src="{{ image_path }}" alt="Selected image" style="max-height: 300px;">
+        {% endif %}
+    </div>
 
-<strong>Question:</strong> {{ question }}<br>
-<strong>Predicted Answer:</strong> {{ answer }}<br>
-<strong>Confidence:</strong> {{ confidence }}<br><br>
+    <div class="result-container">
+        <h2>Results</h2>
+        
+        <div class="result-item">
+            <strong>Question:</strong> {{ question }}
+        </div>
+        
+        <div class="answer-box">
+            <strong>Predicted Answer:</strong> {{ answer }}<br>
+            <span class="confidence"><strong>Confidence:</strong> {{ confidence }}</span>
+        </div>
+    </div>
 
-<a href="/">Try another</a>
+    <a href="/" class="button">Try another question</a>
+</body>
+</html>

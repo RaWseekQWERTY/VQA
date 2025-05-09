@@ -2,39 +2,101 @@
 <html>
 <head>
     <title>Visual Question Answering</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .image-container {
+            margin: 20px 0;
+            text-align: center;
+        }
+        .buttons-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 8px 15px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+        }
+        .upload-container {
+            margin-bottom: 20px;
+        }
+        .submit-button {
+            background-color: #2196F3;
+        }
+        .submit-button:hover {
+            background-color: #0b7dda;
+        }
+    </style>
 </head>
 <body>
-    <h1>Ask a Question About an Image</h1>
+    <h1>Visual Question Answering</h1>
 
     <!-- Show Image if available -->
-    {% if image_path %}
-        <img src="{{ image_path }}" alt="Selected Image" width="300">
-    {% endif %}
+    <div class="image-container">
+        {% if image_path %}
+            <img src="{{ image_path }}" alt="Selected Image" style="max-height: 300px;">
+        {% else %}
+            <p>No image selected. Please upload or select a random image.</p>
+        {% endif %}
+    </div>
 
-    <br><br>
+    <div class="buttons-container">
+        <!-- Random Image Button -->
+        <form action="/random-image/" method="get">
+            <button type="submit">Use Random Image</button>
+        </form>
 
-    <!-- Random Image Button -->
-    <form action="/random-image/" method="get">
-        <button type="submit">Use Random Image</button>
-    </form>
+        <!-- Upload Image Form -->
+        <form action="/upload/" method="post" enctype="multipart/form-data">
+            <input type="file" name="image_file" id="image-upload" accept="image/*" style="display:none">
+            <button type="button" onclick="document.getElementById('image-upload').click()">Upload Image</button>
+        </form>
+    </div>
 
-    <br>
-
-    <!-- Upload Image -->
-    <form action="/" method="get" enctype="multipart/form-data">
-        <input type="file" name="image_file" accept="image/*" onchange="this.form.submit()">
-    </form>
-
-    <br>
+    <!-- Preview uploaded image before submitting -->
+    <script>
+        document.getElementById('image-upload').addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                this.form.submit();
+            }
+        });
+    </script>
 
     <!-- Question Form -->
-    <form action="/predict/" method="post" enctype="multipart/form-data">
-        <input type="text" name="question" placeholder="Enter your question..." required><br><br>
-        {% if image_path %}
-            <!-- Preserve the shown image path in a hidden field -->
+    {% if image_path %}
+    <div>
+        <form action="/predict/" method="post" enctype="multipart/form-data">
+            <input type="text" name="question" placeholder="Enter your question about the image..." required>
+            <!-- Pass the current image path to the prediction route -->
             <input type="hidden" name="image_path" value="{{ image_path }}">
-        {% endif %}
-        <button type="submit">Submit</button>
-    </form>
+            <button type="submit" class="submit-button">Ask Question</button>
+        </form>
+    </div>
+    {% else %}
+    <p>Select an image first to ask questions.</p>
+    {% endif %}
 </body>
 </html>
