@@ -102,14 +102,14 @@ async def get_random_image():
 async def predict(
     request: Request,
     question: str = Form(...),
-    image_path: str = Form(...),  # Now required
+    image_path: str = Form(...),  
 ):
     # Ensure image_path is provided
     if not image_path:
         return templates.TemplateResponse("index.html", {
             "request": request,
             "image_path": None,
-            "answer": "❌ No image provided.",
+            "answer": "No image provided.",
         })
     
     # Convert URL path to local file path
